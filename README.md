@@ -352,16 +352,25 @@ def display_feature_importance(models, X, best_fold_data, y):
         print(f"\nFeature importance for {target}:")
         for name, data in best_fold_data[target].items():
             model = data['model']
-            if hasattr(model, 'feature_importances_'):
+            
+            if name == 'Polynomial':
+                poly_features = model.named_steps['polynomialfeatures']
+                linear_model = model.named_steps['linearregression']
+                feature_names = poly_features.get_feature_names_out(X.columns)
+                coefficients = linear_model.coef_
+                importance = np.abs(coefficients)
+            elif hasattr(model, 'feature_importances_'):
                 importance = model.feature_importances_
+                feature_names = X.columns
             elif hasattr(model, 'coef_'):
                 importance = np.abs(model.coef_)
+                feature_names = X.columns
             else:
                 print(f"  {name} model does not support feature importance extraction.")
                 continue
 
             sorted_idx = importance.argsort()[::-1]
-            sorted_features = X.columns[sorted_idx]
+            sorted_features = np.array(feature_names)[sorted_idx]
             sorted_importance = importance[sorted_idx]
 
             plt.figure(figsize=(10, 6))
