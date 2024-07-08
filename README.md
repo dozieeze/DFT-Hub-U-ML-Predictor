@@ -389,25 +389,20 @@ def display_feature_importance(models, X, best_fold_data, y):
 Load the dataset and define features and target variables.
 
 ```python
-data = pd.read_excel('All System Model May 2024.xlsx', sheet_name='Sheet1')
-features = ["Up_Value/eV", "Ud_Value/eV", "alpha_oxide/degree", "beta_oxide/degree", "gamma_oxide/degree", 
-            "Number of X atoms", "Number of O atoms", "Lattice_constant_a_of_X_pm", "Lattice_constant_b_of_X_pm", 
-            "Lattice_constant_c_of_X_pm", "Atomic_radius/pm_of_X",  "Van_der_Waals_radius/pm_of_X", "Atomic_No_of_X", 
-            "Atomic_Mass/amu_of_X", "Period_of_X", "First_ionization_energy/KJ/mol_of_X", "Density/Kg/m^3_of_X", 
-            "Electron_Affinity/ev_of_X", "Work_Function/ev_of_X", "Pauling_Electronegativity/units_of_X", "d-shell_of_X", 
-            "Lattice_angle_alpha_of_X_degree", "Lattice_angle_beta_of_X_degree", "Lattice_angle_gamma_of_X_degree", 
-            "Lattice_constant_a_of_O_pm", "Lattice_constant_b_of_O_pm", "Lattice_constant_c_of_O_pm", "Atomic_radius/pm_of_O", 
-            "Van_der_Waals_radius/pm_of_O", "Atomic_No_of_O", "Atomic_Mass/amu_of_O", "Period_of_O", 
-            "First_ionization_energy/KJ/mol_of_O", "Density/Kg/m^3_of_O", "Electron_Affinity/ev_of_O", 
-            "Pauling_Electronegativity/units_of_O", "Lattice_angle_alpha_of_O_degree", "Lattice_angle_beta_of_O_degree", 
-            "Lattice_angle_gamma_of_O_degree"]
+data = pd.read_excel('All System Model May 2024.xlsx', sheet_name='All_Systems')
+features = ["Work_Function/ev_of_X", "Number of O atoms", "Density/Kg/m^3_of_X", "Atomic_No_of_X", 
+            "Atomic_Mass/amu_of_X", "Lattice_constant_c_of_X_pm", "Pauling_Electronegativity/units_of_X", 
+            "Number of X atoms", "First_ionization_energy/KJ/mol_of_X", "Van_der_Waals_radius/pm_of_X", 
+            "Period_of_X", "Atomic_radius/pm_of_X", "beta_oxide/degree", "d-shell_of_X", 
+            "Electron_Affinity/ev_of_X", "Ud_Value/eV", "Lattice_constant_a_of_X_pm", "Lattice_constant_b_of_X_pm", 
+            "Up_Value/eV"]
 
 X = data[features]
 y = data[['Calculated_Band_Gap/eV', 'Calculated_a/angstrom', 'Calculated_b/angstrom', 'Calculated_c/angstrom']]
 ```
 
 **Explanation:**
-- **Purpose:** This section loads the dataset from an Excel file and defines the features and target variables.
+- **Purpose:** This section loads the dataset from an Excel file and defines the features and target variables. In this example, the Excel file is named: 'All System Model May 2024.xlsx', and thge sheet which the data is contained in is named 'All_Systems'. The features used in trainiing the data are: Work_Function/ev_of_X, Number of O atoms, Density/Kg/m^3_of_X, Atomic_No_of_X, Atomic_Mass/amu_of_X, Lattice_constant_c_of_X_pm, Pauling_Electronegativity/units_of_X, Number of X atoms, First_ionization_energy/KJ/mol_of_X, Van_der_Waals_radius/pm_of_X, Period_of_X, Atomic_radius/pm_of_X, beta_oxide/degree, d-shell_of_X, Electron_Affinity/ev_of_X, Ud_Value/eV, Lattice_constant_a_of_X_pm, Lattice_constant_b_of_X_pm, and Up_Value/eV; where 'X' represents the metal.
 - **Process:** It reads the data into a pandas DataFrame, selects the relevant features and target variables, and assigns them to `X` and `y` respectively.
 
 #### 5. Define Models
