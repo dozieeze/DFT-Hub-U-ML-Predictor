@@ -3,11 +3,11 @@ Repository for integrating Density Functional Theory (DFT) with Hubbard U correc
 
 
 
-# SCRIPT - ALL SYSTEM MULTI-TARGET + FEATURE IMPORTANCE
+## SCRIPT - ALL SYSTEM MULTI-TARGET + FEATURE IMPORTANCE
 
 This script contains a comprehensive analysis of various regression models for predicting multiple target properties using multiple features. The models are evaluated using cross-validation techniques, and feature importance is displayed for the best-performing models.
 
-## Dependencies
+### Dependencies
 
 Ensure you have the following packages installed:
 
@@ -20,9 +20,9 @@ Ensure you have the following packages installed:
 !pip install matplotlib
 ```
 
-## Usage
+### Usage
 
-### 1. Import Necessary Libraries
+#### 1. Import Necessary Libraries
 
 The script begins by importing necessary libraries for data manipulation, model training, evaluation, and visualization.
 
@@ -45,13 +45,15 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 ```
 
-### 2. Define Cross-Validation and Model Evaluation Functions
+#### 2. Define Cross-Validation and Model Evaluation Functions
 
 The following functions are defined for performing Leave-One-Out Cross-Validation (LOO-CV) and K-Fold Cross-Validation, training the models, and calculating performance metrics.
 
+
+##### Leave-One-Out Cross-Validation Function
+
 ```python
 def loo_cv_cross_val_train_eval_models(models, X, y):
-
     """
     This function performs Leave-One-Out Cross-Validation (LOO-CV) for multiple regression models.
     It trains and evaluates the models on each target variable, returning the evaluation results
@@ -66,7 +68,6 @@ def loo_cv_cross_val_train_eval_models(models, X, y):
     - evaluation_results: Dictionary with average train and test metrics for each model and target.
     - best_fold_data: Dictionary with detailed data of the best performing fold for each model and target.
     """
-
     evaluation_results = {target: {} for target in y.columns}
     best_fold_data = {target: {} for target in y.columns}
     loocv = LeaveOneOut()
@@ -120,11 +121,35 @@ def loo_cv_cross_val_train_eval_models(models, X, y):
             }
 
     return evaluation_results, best_fold_data
+```
 
+**Explanation:**
+- **Purpose:** This function performs Leave-One-Out Cross-Validation (LOO-CV) to evaluate multiple regression models on multiple target variables.
+- **Process:** For each model and each target variable, it trains the model on all but one sample (leaving one out) and tests on the left-out sample. This process repeats until every sample has been left out once.
+- **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target.
 
+**Note on R² Calculation:**
+- R² is not calculated when there is only one sample in LOO-CV, as it requires more than one sample to be meaningful. Therefore, R² is set to NaN (Not a Number) in such cases.
 
+##### K-Fold Cross-Validation Function
 
+```python
 def cross_val_train_eval_models(models, X, y, folds=10):
+    """
+    This function performs K-Fold Cross-Validation for multiple regression models.
+    It trains and evaluates the models on each target variable using the specified number of folds,
+    returning the evaluation results and best fold data.
+
+    Parameters:
+    - models: Dictionary of regression models to be evaluated.
+    - X: Feature dataframe.
+    - y: Target dataframe with multiple columns (one for each target variable).
+    - folds: Number of folds to be used in K-Fold Cross-Validation (default is 10).
+
+    Returns:
+    - evaluation_results: Dictionary with average train and test metrics for each model and target.
+    - best_fold_data: Dictionary with detailed data of the best performing fold for each model and target.
+    """
     evaluation_results = {target: {} for target in y.columns}
     best_fold_data = {target: {} for target in y.columns}
     kfold = KFold(n_splits=folds, shuffle=True, random_state=42)
@@ -178,19 +203,35 @@ def cross_val_train_eval_models(models, X, y, folds=10):
             }
 
     return evaluation_results, best_fold_data
+```
 
+**Explanation:**
+- **Purpose:** This function performs K-Fold Cross-Validation (default 10 folds) to evaluate multiple regression models on multiple target variables.
+- **Process:** For each model and each target variable, it splits the data into K folds, trains the model on K-1 folds, and tests it on the remaining fold. This process repeats K times with each fold used once as the test set.
+- **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target.
 
+##### Metric Calculation Function
 
-
+```python
 def calculate_metrics(y_true, y_pred):
+    """
+    This function calculates various regression metrics including MSE, RMSE, MAE, and R².
+
+    Parameters:
+    - y_true: True values of the target variable.
+    - y_pred: Predicted values of the target variable.
+
+    Returns:
+    - Dictionary containing MSE, RMSE, MAE, and R².
+    """
     mse = mean_squared_error(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
     
-    # Only calculate R^2 if there's more than one sample
+    # Only calculate R² if there's more than one sample
     if len(y_true) > 1:
         r2 = r2_score(y_true, y_pred)
     else:
-        r2 = np.nan  # Set R^2 to NaN for single-sample cases
+        r2 = np.nan  # Set R² to NaN for single-sample cases
     
     return {
         'mse': mse,
@@ -199,6 +240,11 @@ def calculate_metrics(y_true, y_pred):
         'r2': r2
     }
 ```
+
+**Explanation:**
+- **Purpose:** This function calculates and returns key regression metrics: Mean Squared Error (MSE), Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), and R².
+- **Note:** R² is only calculated if there is more than one sample, as it requires multiple samples to be meaningful. For single-sample cases, R² is set to NaN (Not a Number).
+
 
 ### 3. Plotting Functions
 
