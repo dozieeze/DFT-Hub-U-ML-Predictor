@@ -126,10 +126,11 @@ def loo_cv_cross_val_train_eval_models(models, X, y):
 **Explanation:**
 - **Purpose:** This function performs Leave-One-Out Cross-Validation (LOO-CV) to evaluate multiple regression models on multiple target variables.
 - **Process:** For each model and each target variable, it trains the model on all but one sample (leaving one out) and tests on the left-out sample. This process repeats until every sample has been left out once.
-- **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target.
+- **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target. The best fold is determined based on the Mean Squared Error (MSE) of the test set.
 
 **Note on R² Calculation:**
 - R² is not calculated when there is only one sample in LOO-CV, as it requires more than one sample to be meaningful. Therefore, R² is set to NaN (Not a Number) in such cases.
+
 
 ##### K-Fold Cross-Validation Function
 
@@ -208,7 +209,8 @@ def cross_val_train_eval_models(models, X, y, folds=10):
 **Explanation:**
 - **Purpose:** This function performs K-Fold Cross-Validation (default 10 folds) to evaluate multiple regression models on multiple target variables.
 - **Process:** For each model and each target variable, it splits the data into K folds, trains the model on K-1 folds, and tests it on the remaining fold. This process repeats K times with each fold used once as the test set.
-- **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target.
+- **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target. The best fold is determined based on the Mean Squared Error (MSE) of the test set.
+
 
 ##### Metric Calculation Function
 
