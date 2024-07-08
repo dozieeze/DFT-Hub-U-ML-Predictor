@@ -3,21 +3,21 @@ Repository for integrating Density Functional Theory (DFT) with Hubbard U correc
 
 
 
-# ALL SYSTEM MULTI-TARGET + FEATURE IMPORTANCE
+# SCRIPT - ALL SYSTEM MULTI-TARGET + FEATURE IMPORTANCE
 
-This repository contains a comprehensive analysis of various regression models for predicting multiple target properties using multiple features. The models are evaluated using cross-validation techniques, and feature importance is displayed for the best-performing models.
+This script contains a comprehensive analysis of various regression models for predicting multiple target properties using multiple features. The models are evaluated using cross-validation techniques, and feature importance is displayed for the best-performing models.
 
 ## Dependencies
 
 Ensure you have the following packages installed:
 
 ```bash
-pip install scikit-optimize
-pip install xgboost
-pip install numpy
-pip install pandas
-pip install scikit-learn
-pip install matplotlib
+!pip install scikit-optimize
+!pip install xgboost
+!pip install numpy
+!pip install pandas
+!pip install scikit-learn
+!pip install matplotlib
 ```
 
 ## Usage
@@ -51,6 +51,22 @@ The following functions are defined for performing Leave-One-Out Cross-Validatio
 
 ```python
 def loo_cv_cross_val_train_eval_models(models, X, y):
+
+    \"\"\"
+    This function performs Leave-One-Out Cross-Validation (LOO-CV) for multiple regression models.
+    It trains and evaluates the models on each target variable, returning the evaluation results
+    and best fold data.
+
+    Parameters:
+    - models: Dictionary of regression models to be evaluated.
+    - X: Feature dataframe.
+    - y: Target dataframe with multiple columns (one for each target variable).
+
+    Returns:
+    - evaluation_results: Dictionary with average train and test metrics for each model and target.
+    - best_fold_data: Dictionary with detailed data of the best performing fold for each model and target.
+    \"\"\"
+
     evaluation_results = {target: {} for target in y.columns}
     best_fold_data = {target: {} for target in y.columns}
     loocv = LeaveOneOut()
@@ -104,6 +120,9 @@ def loo_cv_cross_val_train_eval_models(models, X, y):
             }
 
     return evaluation_results, best_fold_data
+
+
+
 
 def cross_val_train_eval_models(models, X, y, folds=10):
     evaluation_results = {target: {} for target in y.columns}
@@ -159,6 +178,9 @@ def cross_val_train_eval_models(models, X, y, folds=10):
             }
 
     return evaluation_results, best_fold_data
+
+
+
 
 def calculate_metrics(y_true, y_pred):
     mse = mean_squared_error(y_true, y_pred)
