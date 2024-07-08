@@ -51,15 +51,125 @@ The following functions are defined for performing Leave-One-Out Cross-Validatio
 
 ```python
 def loo_cv_cross_val_train_eval_models(models, X, y):
-    # Function definition here...
+    evaluation_results = {target: {} for target in y.columns}
+    best_fold_data = {target: {} for target in y.columns}
+    loocv = LeaveOneOut()
+
+    for target in y.columns:
+        for name, model in models.items():
+            fold_metrics = {'train': [], 'test': []}
+            best_fold_mse = float('inf')
+            best_fold_index = -1
+
+            for i, (train_index, test_index) in enumerate(loocv.split(X)):
+                X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+                y_train, y_test = y[target].iloc[train_index], y[target].iloc[test_index]
+
+                scaler = StandardScaler()
+                X_train_scaled = scaler.fit_transform(X_train)
+                X_test_scaled = scaler.transform(X_test)
+
+                model.fit(X_train_scaled, y_train)
+                y_train_pred = model.predict(X_train_scaled)
+                y_test_pred = model.predict(X_test_scaled)
+
+                train_metrics = calculate_metrics(y_train, y_train_pred)
+                test_metrics = calculate_metrics(y_test, y_test_pred)
+                
+                fold_metrics['train'].append(train_metrics)
+                fold_metrics['test'].append(test_metrics)
+
+                if test_metrics['mse'] < best_fold_mse:
+                    best_fold_mse = test_metrics['mse']
+                    best_fold_index = i
+                    best_fold_data[target][name] = {
+                        'train_index': train_index, 'test_index': test_index,
+                        'model': model,
+                        'best_fold_train_metrics': train_metrics,
+                        'best_fold_test_metrics': test_metrics,
+                        'best_train_actuals': y_train,
+                        'best_train_predictions': y_train_pred,
+                        'best_test_actuals': y_test,
+                        'best_test_predictions': y_test_pred
+                    }
+
+            avg_metrics = {
+                'train': {k: np.mean([fold[k] for fold in fold_metrics['train']]) for k in fold_metrics['train'][0]},
+                'test': {k: np.mean([fold[k] for fold in fold_metrics['test']]) for k in fold_metrics['test'][0]}
+            }
+            evaluation_results[target][name] = {
+                'avg_train_metrics': avg_metrics['train'],
+                'avg_test_metrics': avg_metrics['test'],
+                'best_fold': best_fold_index
+            }
+
     return evaluation_results, best_fold_data
 
 def cross_val_train_eval_models(models, X, y, folds=10):
-    # Function definition here...
+    evaluation_results = {target: {} for target in y.columns}
+    best_fold_data = {target: {} for target in y.columns}
+    kfold = KFold(n_splits=folds, shuffle=True, random_state=42)
+
+    for target in y.columns:
+        for name, model in models.items():
+            fold_metrics = {'train': [], 'test': []}
+            best_fold_mse = float('inf')
+            best_fold_index = -1
+
+            for i, (train_index, test_index) in enumerate(kfold.split(X)):
+                X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+                y_train, y_test = y[target].iloc[train_index], y[target].iloc[test_index]
+
+                scaler = StandardScaler()
+                X_train_scaled = scaler.fit_transform(X_train)
+                X_test_scaled = scaler.transform(X_test)
+
+                model.fit(X_train_scaled, y_train)
+                y_train_pred = model.predict(X_train_scaled)
+                y_test_pred = model.predict(X_test_scaled)
+
+                train_metrics = calculate_metrics(y_train, y_train_pred)
+                test_metrics = calculate_metrics(y_test, y_test_pred)
+                
+                fold_metrics['train'].append(train_metrics)
+                fold_metrics['test'].append(test_metrics)
+
+                if test_metrics['mse'] < best_fold_mse:
+                    best_fold_mse = test_metrics['mse']
+                    best_fold_index = i
+                    best_fold_data[target][name] = {
+                        'train_index': train_index, 'test_index': test_index,
+                        'model': model,
+                        'best_fold_train_metrics': train_metrics,
+                        'best_fold_test_metrics': test_metrics,
+                        'best_train_actuals': y_train,
+                        'best_train_predictions': y_train_pred,
+                        'best_test_actuals': y_test,
+                        'best_test_predictions': y_test_pred
+                    }
+
+            avg_metrics = {
+                'train': {k: np.mean([fold[k] for fold in fold_metrics['train']]) for k in fold_metrics['train'][0]},
+                'test': {k: np.mean([fold[k] for fold in fold_metrics['test']]) for k in fold_metrics['test'][0]}
+            }
+            evaluation_results[target][name] = {
+                'avg_train_metrics': avg_metrics['train'],
+                'avg_test_metrics': avg_metrics['test'],
+                'best_fold': best_fold_index
+            }
+
     return evaluation_results, best_fold_data
 
 def calculate_metrics(y_true, y_pred):
-    # Function definition here...
+    mse = mean_squared_error(y_true, y_pred)
+    mae = mean_absolute_error(y_true, y_pred)
+    
+    # Only calculate R^2 if there's more than one sample
+    if len(y_true) > 1:
+        r2 = r2_score(y_true, y_pred)
+    else:
+        r2 = np.nan  # Set R^2 to NaN for single-sample cases
+    
     return {
         'mse': mse,
         'rmse': np.sqrt(mse),
@@ -74,14 +184,83 @@ Functions for plotting the results and displaying feature importance are defined
 
 ```python
 def plot_best_fold_all(sorted_evaluation_results, X, y, best_fold_data):
-    # Function definition here...
+    num_targets = len(y.columns)
+    num_models = len(sorted_evaluation_results[y.columns[0]])
+    fig, axes = plt.subplots(nrows=num_targets, ncols=num_models, figsize=(num_models * 5, num_targets * 5))
+    
+    if num_targets == 1:
+        axes = [axes]
+    if num_models == 1:
+        axes = [[ax] for ax in axes]
+
+    for target_index, target in enumerate(y.columns):
+        target_name = target.replace('_', ' ').replace('Calculated ', '')
+        for model_index, (name, _) in enumerate(sorted_evaluation_results[target]):
+            ax = axes[target_index][model_index]
+            data = best_fold_data[target][name]
+            
+            plot_scatter(ax, data['best_train_actuals'], data['best_train_predictions'], 
+                         data['best_test_actuals'], data['best_test_predictions'])
+            
+            ax.set_title(f'{name} - {target_name}', fontsize=18, weight='bold')
+            ax.set_xlabel('DFT+U', fontsize=18, weight='bold')
+            ax.set_ylabel('ML Predicted', fontsize=18, weight='bold')
+            
+            ax.set_aspect('equal', adjustable='box')
+            ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+            ax.yaxis.set_major_locator(MaxNLocator(nbins=4))
+            ax.tick_params(axis='both', which='major', labelsize=16)
+            
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontweight('bold')
+            
+            ax.legend(prop={'size': 12, 'weight': 'bold'}, title_fontsize='12', shadow=True, frameon=True)
+    
+    plt.tight_layout()
     plt.show()
 
 def plot_scatter(ax, y_train, y_train_pred, y_test, y_test_pred):
-    # Function definition here...
+    ax.scatter(y_train, y_train_pred, color='blue', label='Train Data', alpha=0.6)
+    ax.scatter(y_test, y_test_pred, color='red', label='Test Data', alpha=0.6)
+    
+    all_vals = np.concatenate([y_train, y_train_pred, y_test, y_test_pred])
+    min_val, max_val = np.min(all_vals), np.max(all_vals)
+    buffer = (max_val - min_val) * 0.05
+    
+    ax.plot([min_val - buffer, max_val + buffer], [min_val - buffer, max_val + buffer], 'k--', lw=2)
+    ax.set_xlim([min_val - buffer, max_val + buffer])
+    ax.set_ylim([min_val - buffer, max_val + buffer])
 
 def display_feature_importance(models, X, best_fold_data, y):
-    # Function definition here...
+    for target in y.columns:
+        print(f"\nFeature importance for {target}:")
+        for name, data in best_fold_data[target].items():
+            model = data['model']
+            if hasattr(model, 'feature_importances_'):
+                importance = model.feature_importances_
+            elif hasattr(model, 'coef_'):
+                importance = np.abs(model.coef_)
+            else:
+                print(f"  {name} model does not support feature importance extraction.")
+                continue
+
+            sorted_idx = importance.argsort()[::-1]
+            sorted_features = X.columns[sorted_idx]
+            sorted_importance = importance[sorted_idx]
+
+            plt.figure(figsize=(10, 6))
+            plt.bar(range(len(sorted_importance)), sorted_importance, align='center')
+            plt.xticks(range(len(sorted_importance)), sorted_features, rotation=90)
+            plt.xlabel('Features')
+            plt.ylabel('Importance')
+            plt.title(f'Feature Importance for {name} Model - {target}')
+            plt.tight_layout()
+            plt.show()
+
+            print(f"  {name} model:")
+            for feat, imp in zip(sorted_features, sorted_importance):
+                print(f"    {feat}: {imp:.4f}")
+            print()
 ```
 
 ### 4. Load Data
@@ -130,7 +309,7 @@ Train and evaluate the models using cross-validation techniques.
 
 ```python
 # Leave-one-out CV
-#evaluation_results, best_fold_data = loo_cv_cross_val_train_eval_models(models, X, y)
+# evaluation_results, best_fold_data = loo_cv_cross_val_train_eval_models(models, X, y)
 
 # KFold CV
 evaluation_results, best_fold_data = cross_val_train_eval_models(models, X, y, folds=50)
