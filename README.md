@@ -128,9 +128,6 @@ def loo_cv_cross_val_train_eval_models(models, X, y):
 - **Process:** For each model and each target variable, it trains the model on all but one sample (leaving one out) and tests on the left-out sample. This process repeats until every sample has been left out once.
 - **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target. The best fold is determined based on the Mean Squared Error (MSE) of the test set.
 
-**Note on R² Calculation:**
-- R² is not calculated when there is only one sample in LOO-CV, as it requires more than one sample to be meaningful. Therefore, R² is set to NaN (Not a Number) in such cases.
-
 
 ##### K-Fold Cross-Validation Function
 
@@ -248,12 +245,23 @@ def calculate_metrics(y_true, y_pred):
 - **Note:** R² is only calculated if there is more than one sample, as it requires multiple samples to be meaningful. For single-sample cases, R² is set to NaN (Not a Number).
 
 
-### 3. Plotting Functions
+#### 3. Plotting Functions
 
 Functions for plotting the results and displaying feature importance are defined as follows:
 
+##### Plot Best Fold Results for All Models and Targets
+
 ```python
 def plot_best_fold_all(sorted_evaluation_results, X, y, best_fold_data):
+    """
+    This function plots the best performing fold results for all models and target variables.
+    
+    Parameters:
+    - sorted_evaluation_results: Sorted evaluation results for each target and model.
+    - X: Feature dataframe.
+    - y: Target dataframe with multiple columns (one for each target variable).
+    - best_fold_data: Detailed data of the best performing fold for each model and target.
+    """
     num_targets = len(y.columns)
     num_models = len(sorted_evaluation_results[y.columns[0]])
     fig, axes = plt.subplots(nrows=num_targets, ncols=num_models, figsize=(num_models * 5, num_targets * 5))
@@ -288,8 +296,27 @@ def plot_best_fold_all(sorted_evaluation_results, X, y, best_fold_data):
     
     plt.tight_layout()
     plt.show()
+```
 
+**Explanation:**
+- **Purpose:** This function plots the results of the best performing fold for all models and target variables.
+- **Process:** For each target and model, it plots the true vs. predicted values for the training and test sets from the best performing fold. The plots are arranged in a grid with rows representing targets and columns representing models.
+
+
+##### Scatter Plot Function
+
+```python
 def plot_scatter(ax, y_train, y_train_pred, y_test, y_test_pred):
+    """
+    This function creates a scatter plot of true vs. predicted values for both training and test sets.
+    
+    Parameters:
+    - ax: Matplotlib axis object where the plot will be drawn.
+    - y_train: True values of the training set.
+    - y_train_pred: Predicted values of the training set.
+    - y_test: True values of the test set.
+    - y_test_pred: Predicted values of the test set.
+    """
     ax.scatter(y_train, y_train_pred, color='blue', label='Train Data', alpha=0.6)
     ax.scatter(y_test, y_test_pred, color='red', label='Test Data', alpha=0.6)
     
@@ -300,8 +327,26 @@ def plot_scatter(ax, y_train, y_train_pred, y_test, y_test_pred):
     ax.plot([min_val - buffer, max_val + buffer], [min_val - buffer, max_val + buffer], 'k--', lw=2)
     ax.set_xlim([min_val - buffer, max_val + buffer])
     ax.set_ylim([min_val - buffer, max_val + buffer])
+```
 
+**Explanation:**
+- **Purpose:** This function creates a scatter plot of the true vs. predicted values for the training and test sets.
+- **Process:** It plots the true vs. predicted values for the training set in blue and the test set in red. It also plots a diagonal line representing the ideal case where predicted values equal true values.
+
+
+#### Display Feature Importance
+
+```python
 def display_feature_importance(models, X, best_fold_data, y):
+    """
+    This function displays and plots the feature importance for the best performing models for each target variable.
+    
+    Parameters:
+    - models: Dictionary of regression models to be evaluated.
+    - X: Feature dataframe.
+    - best_fold_data: Detailed data of the best performing fold for each model and target.
+    - y: Target dataframe with multiple columns (one for each target variable).
+    """
     for target in y.columns:
         print(f"\nFeature importance for {target}:")
         for name, data in best_fold_data[target].items():
@@ -332,6 +377,11 @@ def display_feature_importance(models, X, best_fold_data, y):
                 print(f"    {feat}: {imp:.4f}")
             print()
 ```
+
+**Explanation:**
+- **Purpose:** This function displays and plots the feature importance for the best performing models for each target variable.
+- **Process:** For each target and model, it extracts the feature importance if supported by the model, sorts the features by importance (absolute values), and creates a bar plot. It also prints the feature importance values.
+
 
 ### 4. Load Data
 
