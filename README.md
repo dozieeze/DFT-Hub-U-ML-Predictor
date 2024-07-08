@@ -126,6 +126,7 @@ def loo_cv_cross_val_train_eval_models(models, X, y):
 **Explanation:**
 - **Purpose:** This function performs Leave-One-Out Cross-Validation (LOO-CV) to evaluate multiple regression models on multiple target variables.
 - **Process:** For each model and each target variable, it trains the model on all but one sample (leaving one out) and tests on the left-out sample. This process repeats until every sample has been left out once.
+- **Scaling:** The features are scaled using 'StandardScaler' to standardize the dataset by removing the mean and scaling to unit variance. The scaler is fit to the training data and then used to transform both the training and test data. This is essential because many machine learning algorithms perform better when features are on the same scale. Standardization helps in improving the performance and training stability of the models.
 - **Outputs:** It returns evaluation results (average metrics across all folds) and detailed data for the best performing fold for each model and target. The best fold is determined based on the Mean Squared Error (MSE) of the test set.
 
 
@@ -334,7 +335,7 @@ def plot_scatter(ax, y_train, y_train_pred, y_test, y_test_pred):
 - **Process:** It plots the true vs. predicted values for the training set in blue and the test set in red. It also plots a diagonal line representing the ideal case where predicted values equal true values.
 
 
-#### Display Feature Importance
+##### Display Feature Importance
 
 ```python
 def display_feature_importance(models, X, best_fold_data, y):
@@ -383,7 +384,7 @@ def display_feature_importance(models, X, best_fold_data, y):
 - **Process:** For each target and model, it extracts the feature importance if supported by the model, sorts the features by importance (absolute values), and creates a bar plot. It also prints the feature importance values.
 
 
-### 4. Load Data
+#### 4. Load Data
 
 Load the dataset and define features and target variables.
 
@@ -405,7 +406,11 @@ X = data[features]
 y = data[['Calculated_Band_Gap/eV', 'Calculated_a/angstrom', 'Calculated_b/angstrom', 'Calculated_c/angstrom']]
 ```
 
-### 5. Define Models
+**Explanation:**
+- **Purpose:** This section loads the dataset from an Excel file and defines the features and target variables.
+- **Process:** It reads the data into a pandas DataFrame, selects the relevant features and target variables, and assigns them to `X` and `y` respectively.
+
+#### 5. Define Models
 
 Define a dictionary of models to be evaluated.
 
@@ -423,7 +428,11 @@ models = {
 }
 ```
 
-### 6. Train and Evaluate Models
+**Explanation:**
+- **Purpose:** This section defines a dictionary of regression models to be evaluated.
+- **Process:** It creates instances of various regression models (estimators) with hyperparameters and adds them to a dictionary with descriptive names as keys.
+
+#### 6. Train and Evaluate Models
 
 Train and evaluate the models using cross-validation techniques.
 
@@ -432,7 +441,7 @@ Train and evaluate the models using cross-validation techniques.
 # evaluation_results, best_fold_data = loo_cv_cross_val_train_eval_models(models, X, y)
 
 # KFold CV
-evaluation_results, best_fold_data = cross_val_train_eval_models(models, X, y, folds=50)
+evaluation_results, best_fold_data = cross_val_train_eval_models(models, X, y, folds=20)
 
 # Sort models based on average test MSE
 sorted_evaluation_results = {target: sorted(evaluation_results[target].items(), 
@@ -440,7 +449,12 @@ sorted_evaluation_results = {target: sorted(evaluation_results[target].items(),
                              for target in y.columns}
 ```
 
-### 7. Print Model Performance Metrics
+**Explanation:**
+- **Purpose:** This section trains and evaluates the models using cross-validation techniques.
+- **Process:** It uses K-Fold Cross-Validation (K = 20) to train and evaluate the models, but also provides the option to use Leave-One-Out Cross-Validation (LOO-CV) if needed. After evaluation, it sorts the models based on the average test Mean Squared Error for each target variable.
+
+
+#### 7. Print Model Performance Metrics
 
 Print the performance metrics for each model and target variable.
 
@@ -464,7 +478,11 @@ for target in y.columns:
               f"MAE = {best_test['mae']:.2f}, R2 = {best_test['r2']:.2f}\n")
 ```
 
-### 8. Plot Results
+**Explanation:**
+- **Purpose:** This section prints the performance metrics for each model and target variable.
+- **Process:** For each target, it iterates through the sorted evaluation results and prints the average train and test metrics, as well as the best fold train and test metrics.
+
+#### 8. Plot Results
 
 Plot the results for the best performing folds.
 
@@ -472,7 +490,11 @@ Plot the results for the best performing folds.
 plot_best_fold_all(sorted_evaluation_results, X, y, best_fold_data)
 ```
 
-### 9. Display Feature Importance
+**Explanation:**
+- **Purpose:** This section plots the results of the best performing fold for all models and target variables.
+- **Process:** It uses the `plot_best_fold_all` function to create scatter plots of true vs. predicted values for the training and test sets from the best performing fold.
+
+#### 9. Display Feature Importance
 
 Display the feature importance for the best-performing models.
 
@@ -480,6 +502,10 @@ Display the feature importance for the best-performing models.
 display_feature_importance(models, X, best_fold_data, y)
 ```
 
+**Explanation:**
+- **Purpose:** This section displays and plots the feature importance for the best performing models for each target variable.
+- **Process:** It uses the `display_feature_importance` function to extract, sort, and plot the feature importance for each model and target.
+
 ## Conclusion
 
-This repository provides a robust framework for evaluating and comparing the performance of various regression models on multiple target properties. The cross-validation techniques and feature importance analysis offer insights into the model's predictive power and the significance of each feature.
+This script provides a robust framework for evaluating and comparing the performance of various regression models on multiple target properties. The cross-validation techniques and feature importance analysis offer insights into the model's predictive power and the significance of each feature. By following the steps outlined in this README, users can load their data, define models, train and evaluate them, and visualize the results to make informed decisions about their machine learning models.
