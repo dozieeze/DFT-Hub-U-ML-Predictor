@@ -52,7 +52,7 @@ The following functions are defined for performing Leave-One-Out Cross-Validatio
 ```python
 def loo_cv_cross_val_train_eval_models(models, X, y):
 
-    \"\"\"
+    """
     This function performs Leave-One-Out Cross-Validation (LOO-CV) for multiple regression models.
     It trains and evaluates the models on each target variable, returning the evaluation results
     and best fold data.
@@ -65,7 +65,7 @@ def loo_cv_cross_val_train_eval_models(models, X, y):
     Returns:
     - evaluation_results: Dictionary with average train and test metrics for each model and target.
     - best_fold_data: Dictionary with detailed data of the best performing fold for each model and target.
-    \"\"\"
+    """
 
     evaluation_results = {target: {} for target in y.columns}
     best_fold_data = {target: {} for target in y.columns}
