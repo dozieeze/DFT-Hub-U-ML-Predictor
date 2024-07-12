@@ -3,11 +3,17 @@ Repository for integrating Density Functional Theory (DFT) with Hubbard U correc
 
 ## Required Packages:
 scikit-optimize: 0.10.2
+
 xgboost: 2.1.6
+
 numpy: 2.0.0
+
 pandas: 2.2.2
+
 scikit-learn: 1.5.1
+
 matplotlib: 3.9.1
+
 
 ## SCRIPT - ALL SYSTEM MULTI-TARGET + FEATURE IMPORTANCE
 
