@@ -56,10 +56,11 @@ def plot_feature_coefficients(coefficients, intercept, target_names):
         plt.grid(True)
         plt.tight_layout()
         plt.show()
+```
 
+```python
 target_names = ['Calculated_Band_Gap/eV', 'Calculated_a/angstrom', 'Calculated_b/angstrom', 'Calculated_c/angstrom']
 plot_feature_coefficients(coefficients, intercept, target_names)
-
 ```
 This section visualizes the feature coefficients:
 
@@ -71,7 +72,9 @@ This visualization helps in understanding the importance of each feature for pre
 ```python
 new_data = pd.read_excel('All System Model May 2024.xlsx', sheet_name='C-CeO2')
 X_new = new_data[features]
+```
 
+```python
 # Experimental values for Cubic CeO2
 exp_band_gap = 3.2
 exp_lattice_a = 5.411
@@ -79,11 +82,13 @@ exp_lattice_b = 5.411
 exp_lattice_c = 5.411
 
 experimental_values = np.array([exp_band_gap, exp_lattice_a, exp_lattice_b, exp_lattice_c])
-
-# Define the weights
-weights = np.array([1, 1, 1, 1])  # Equal weights for all properties
-This section prepares for prediction on new data:
 ```
+
+```python
+weights = np.array([1, 1, 1, 1])  # Equal weights for all properties
+```
+
+This section prepares for prediction on new data:
 Loads new data from an Excel file.
 Sets experimental values for comparison (in this case, for Cubic CeO2).
 Defines weights for each property in the optimization process.
@@ -96,7 +101,8 @@ def calculate_weighted_ape(predicted, experimental, weights):
     absolute_percentage_errors = np.abs((predicted - experimental) / experimental)
     weighted_absolute_percentage_errors = np.sum(weights * absolute_percentage_errors) / np.sum(weights) 
     return weighted_absolute_percentage_errors
-
+```
+```python
 search_space_both = [
     Real(0.01, 40.00, name='up_value'),
     Real(0.01, 40.00, name='ud_value')
@@ -105,7 +111,8 @@ search_space_both = [
 search_space_ud_only = [
     Real(0.01, 40.00, name='ud_value')
 ]
-
+```
+```python
 @use_named_args(search_space_both)
 def objective_both(up_value, ud_value):
     X_new_temp = X_new.copy()
@@ -115,7 +122,8 @@ def objective_both(up_value, ud_value):
     y_pred = multi_target_model.predict(X_new_temp)
     loss = calculate_weighted_ape(y_pred, experimental_values, weights)
     return loss
-
+```
+```python
 @use_named_args(search_space_ud_only)
 def objective_ud_only(ud_value):
     X_new_temp = X_new.copy()
@@ -125,10 +133,10 @@ def objective_ud_only(ud_value):
     y_pred = multi_target_model.predict(X_new_temp)
     loss = calculate_weighted_ape(y_pred, experimental_values, weights)
     return loss
-
+```
+```python
 result_both = gp_minimize(objective_both, search_space_both, n_calls=200, random_state=100)
 result_ud_only = gp_minimize(objective_ud_only, search_space_ud_only, n_calls=50, random_state=100)
-
 ```
 
 This section performs Bayesian optimization to find optimal Hubbard U parameters:
