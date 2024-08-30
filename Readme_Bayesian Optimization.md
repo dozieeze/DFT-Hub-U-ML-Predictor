@@ -108,11 +108,23 @@ search_space_ud_only = [
 
 @use_named_args(search_space_both)
 def objective_both(up_value, ud_value):
-    # ... (function implementation)
+    X_new_temp = X_new.copy()
+    X_new_temp['Up_Value/eV'] = up_value
+    X_new_temp['Ud_Value/eV'] = ud_value
+    
+    y_pred = multi_target_model.predict(X_new_temp)
+    loss = calculate_weighted_ape(y_pred, experimental_values, weights)
+    return loss
 
 @use_named_args(search_space_ud_only)
 def objective_ud_only(ud_value):
-    # ... (function implementation)
+    X_new_temp = X_new.copy()
+    X_new_temp['Up_Value/eV'] = 0  # Fix Up to zero
+    X_new_temp['Ud_Value/eV'] = ud_value
+    
+    y_pred = multi_target_model.predict(X_new_temp)
+    loss = calculate_weighted_ape(y_pred, experimental_values, weights)
+    return loss
 
 result_both = gp_minimize(objective_both, search_space_both, n_calls=200, random_state=100)
 result_ud_only = gp_minimize(objective_ud_only, search_space_ud_only, n_calls=50, random_state=100)
