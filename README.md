@@ -269,11 +269,10 @@ def plot_best_fold_all(sorted_evaluation_results, X, y, best_fold_data):
     }
     
     target_labels = {
-        'Calculated_Band_Gap/eV': ('rPBE band gap (eV)', 'ML band gap (eV)'),
-        #'Calculated_a/angstrom': ('rPBE a ≡ b (Å)', 'ML a ≡ b (Å)'),
-        'Calculated_a/angstrom': ('rPBE a (Å)', 'ML a (Å)'),
-        'Calculated_b/angstrom': ('rPBE b (Å)', 'ML b (Å)'),
-        'Calculated_c/angstrom': ('rPBE c (Å)', 'ML c (Å)')
+        '<target_1>': ('rPBE <target_1>', 'ML <target_1>'),
+        '<target_2>': ('rPBE <target_2>', 'ML <target_2>'),
+        '<target_3>': ('rPBE <target_3>', 'ML <target_3>'),
+        '<target_4>': ('rPBE <target_4>', 'ML <target_4>')
     }
 
     for target_index, target in enumerate(y.columns):
@@ -341,12 +340,10 @@ def plot_model_results(sorted_evaluation_results, X, y, model_data):
     }
     
     target_labels = {
-        'Calculated_Band_Gap/eV': ('rPBE band gap (eV)', 'ML band gap (eV)'),
-        #'Calculated_a/angstrom': ('rPBE a ≡ b ≡ c (Å)', 'ML a ≡ b ≡ c (Å)'),
-        'Calculated_a/angstrom': ('rPBE a ≡ b (Å)', 'ML a ≡ b (Å)'),
-        #'Calculated_a/angstrom': ('rPBE a (Å)', 'ML a (Å)'),
-        'Calculated_b/angstrom': ('rPBE b (Å)', 'ML b (Å)'),
-        'Calculated_c/angstrom': ('rPBE c (Å)', 'ML c (Å)')
+        '<target_1>': ('rPBE <target_1>', 'ML <target_1>'),
+        '<target_2>': ('rPBE <target_2>', 'ML <target_2>'),
+        '<target_3>': ('rPBE <target_3>', 'ML <target_3>'),
+        '<target_4>': ('rPBE <target_4>', 'ML <target_4>')
     }
 
     for target_index, target in enumerate(y.columns):
@@ -357,8 +354,7 @@ def plot_model_results(sorted_evaluation_results, X, y, model_data):
             scatter = plot_scatter(ax, data['test_actuals'], data['test_predictions'])
             
             model_abbr = model_abbreviations.get(name, name)
-            alphabet_label = chr(103 + model_index)  # 103 is the ASCII code for 'g'
-            #alphabet_label = chr(97 + model_index)  # 97 is the ASCII code for 'a'
+            alphabet_label = chr(97 + model_index)  # 97 is the ASCII code for 'a'
             ax.set_title(f'({alphabet_label}). {model_abbr}', fontsize=18, weight='bold')
             
             x_label, y_label = target_labels.get(target, ('rPBE', 'ML Predicted'))
@@ -461,12 +457,10 @@ def display_feature_importance(X_train, X_test, y_train, y_test, model_data):
                 print(f"  {name} model does not support feature importance extraction.")
                 continue
 
-            # Sort features by importance
             sorted_idx = np.argsort(np.abs(importance))[::-1]
             sorted_features = np.array(feature_names)[sorted_idx]
             sorted_importance = importance[sorted_idx]
 
-            # Plot feature importance
             plt.figure(figsize=(10, 6))
             plt.bar(range(len(sorted_importance)), sorted_importance, align='center')
             plt.xticks(range(len(sorted_importance)), sorted_features, rotation=90)
@@ -501,19 +495,13 @@ Define a dictionary of models to be evaluated.
 
 ```python
 models = {
-    # No Linear Scaling
     'Linear': Pipeline([('regressor', LinearRegression())]),
-    # No Polynomial Scaling
     'Polynomial': Pipeline([('poly', PolynomialFeatures(2)), ('regressor', LinearRegression())]),
     'Random Forest': Pipeline([('scaler', StandardScaler()), ('regressor', RandomForestRegressor(random_state=100))]),
     'Gradient Boosting': Pipeline([('scaler', StandardScaler()), ('regressor', GradientBoostingRegressor(random_state=100))]),
     'XGBoost': Pipeline([('scaler', StandardScaler()), ('regressor', XGBRegressor(random_state=100))]),
     'Gaussian Process': Pipeline([('regressor', GaussianProcessRegressor(kernel=RBF(), alpha=0.0001, random_state=100))]), 
-    # No Ridge Scaling
     #'Ridge': Pipeline([('regressor', Ridge())]),
-    #'Linear': Pipeline([('scaler', StandardScaler()), ('regressor', LinearRegression())]),
-    #'Ridge': Pipeline([('scaler', StandardScaler()), ('regressor', Ridge())]),
-    #'Polynomial': Pipeline([('poly', PolynomialFeatures(2)), ('scaler', StandardScaler()), ('regressor', LinearRegression())]),
     #'Decision Tree': Pipeline([('scaler', StandardScaler()), ('regressor', DecisionTreeRegressor(random_state=100))])
 }
 ```
@@ -524,38 +512,70 @@ models = {
 
 <br/><br/>
 #### 6. Load Data
+##### 6.1. Load Data for Cross-Validation
+This section outlines how to load the dataset and define features and target variables for cross-validation scenarios.
 
-Load the dataset and define features and target variables.
+**Load Dataset**
 
 ```python
-# Load data
-#All available metal oxides data including Extrapolation Data
-data = pd.read_excel('<materials data>.xlsx', sheet_name='All_Systems + Extra')
+data = pd.read_excel('<materials_data>.xlsx', sheet_name='<sheet_name>')
+```
+**Define Features**
+```python
+features = ["<feature_1>", "<feature_2>", ............, "<feature_n>"]
+```
+**Define Target Variables**
 
-#Primary Oxides without Extrapolation Data
-#data = pd.read_excel('<materials data>.xlsx', sheet_name='Rutile TiO2 Orig')
-#data = pd.read_excel('<materials data>.xlsx', sheet_name='Anatase TiO2 Orig')
-#data = pd.read_excel('<materials data>.xlsx', sheet_name='Cubic ZnO Orig')
-#data = pd.read_excel('<materials data>.xlsx', sheet_name='Cubic ZnO2 Orig')
-#data = pd.read_excel('<materials data>.xlsx', sheet_name='Cubic ZrO2 Orig')
-#data = pd.read_excel('<materials data>.xlsx', sheet_name='Cubic CeO2 Orig')
-#data = pd.read_excel('<materials data>.xlsx', sheet_name='All_Primary_System')
-
-
-#All available features
-features = ["Up_Value/eV", "Ud_Value/eV", "alpha_oxide/degree", "beta_oxide/degree", "gamma_oxide/degree", "Number of X atoms", "Number of O atoms", "Lattice_constant_a_of_X_pm", "Lattice_constant_b_of_X_pm", "Lattice_constant_c_of_X_pm", "Atomic_radius/pm_of_X",  "Van_der_Waals_radius/pm_of_X", "Atomic_No_of_X", "Atomic_Mass/amu_of_X", "Period_of_X", "First_ionization_energy/KJ/mol_of_X", "Density/Kg/m^3_of_X", "Electron_Affinity/ev_of_X", "Work_Function/ev_of_X", "Pauling_Electronegativity/units_of_X", "d-shell_of_X", "Lattice_angle_alpha_of_X_degree", "Lattice_angle_beta_of_X_degree", "Lattice_angle_gamma_of_X_degree", "Lattice_constant_a_of_O_pm", "Lattice_constant_b_of_O_pm", "Lattice_constant_c_of_O_pm", "Atomic_radius/pm_of_O", "Van_der_Waals_radius/pm_of_O", "Atomic_No_of_O", "Atomic_Mass/amu_of_O", "Period_of_O", "First_ionization_energy/KJ/mol_of_O", "Density/Kg/m^3_of_O", "Electron_Affinity/ev_of_O", "Pauling_Electronegativity/units_of_O", "Lattice_angle_alpha_of_O_degree", "Lattice_angle_beta_of_O_degree", "Lattice_angle_gamma_of_O_degree"]
-
-#Ud and Up as features
-#features = ["Ud_Value/eV", "Up_Value/eV"]
-
-
+```python
+targets = ['<target_1>', '<target_2>', '<target_3>', '<target_4>']
+```
+**Prepare Data for Cross-Validation**
+ 
+```python
 X = data[features]
-y = data[['Calculated_Band_Gap/eV', 'Calculated_a/angstrom', 'Calculated_b/angstrom', 'Calculated_c/angstrom']]
+y = data[targets]
 ```
 
+##### 6.2. Load Data for Separate Training and Test Sets
+
+**Load Training Data**
+
+
+```python
+train_data = pd.read_excel('<materials_data>.xlsx', sheet_name='<train_data_sheet_name>')
+```
+
+**Load Test Data**
+
+```python
+test_data = pd.read_excel('<materials_data>.xlsx', sheet_name='<test_data_sheet_name>')
+```
+
+**Define Features**
+
+```python
+features = ["<feature_1>", "<feature_2>", ............, "<feature_n>"]
+```
+
+**Define Target Variables**
+```python
+targets = ['<target_1>', '<target_2>', '<target_3>', '<target_4>']
+```
+**Prepare Training and Test Data**
+
+```python
+X_train = train_data[features]
+y_train = train_data[targets]
+X_test = test_data[features]
+y_test = test_data[targets]
+```
+
+
 **Explanation:**
-- **Purpose:** This section loads the dataset from an Excel file and defines the features and target variables. The Excel file is named <materials data>.xlsx, and the sheet containing the data is named All_Systems + Extra. The features used for training include a comprehensive set of physical and chemical properties such as Up_Value/eV, Ud_Value/eV, alpha_oxide/degree, beta_oxide/degree, gamma_oxide/degree, Number of X atoms, Number of O atoms, and various lattice constants, atomic properties, and electronic characteristics for both the metal (X) and oxygen atoms.
-- **Process:** It reads the data into a pandas DataFrame using pd.read_excel(). The code selects all available features (39 in total) and assigns them to the variable X. The target variables (Calculated_Band_Gap/eV, Calculated_a/angstrom, Calculated_b/angstrom, Calculated_c/angstrom) are assigned to y. The commented-out lines provide options for loading different datasets or using a reduced set of features, allowing for flexibility in the analysis.
+- **Purpose:** This section loads the dataset(s) from Excel file(s) and defines the features and target variables. The process varies depending on whether you're using cross-validation or separate training and test sets.
+  
+- **Process:** For cross-validation, the Excel file is named '<materials_data>.xlsx', typically using the sheet named '<sheet_name>'. For separate sets, two sheets or files may be used, one for training (e.g., '<train_data_sheet_name>') and one for testing (e.g., '<test_data_sheet_name>').
+
 
 <br/><br/>
 #### 7. Train and Evaluate Models
