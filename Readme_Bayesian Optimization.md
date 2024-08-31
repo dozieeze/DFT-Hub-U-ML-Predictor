@@ -121,7 +121,7 @@ def objective_both(up_value, ud_value):
 @use_named_args(search_space_ud_only)
 def objective_ud_only(ud_value):
     X_new_temp = X_new.copy()
-    X_new_temp['Up_Value/eV'] = 0  # Fix Up to zero
+    X_new_temp['Up_Value/eV'] = 0  # Fix U_p to zero
     X_new_temp['Ud_Value/eV'] = ud_value
     
     y_pred = multi_target_model.predict(X_new_temp)
@@ -134,9 +134,9 @@ result_ud_only = gp_minimize(objective_ud_only, search_space_ud_only, n_calls=20
 ```
 
 **Explanation:** This step optimizes the Hubbard U parameters to minimize discrepancies between predicted and experimental values.  
-- **Purpose:** To determine the optimal Hubbard U parameters (Up and Ud/f) that reduce the difference between model predictions and experimental results.  
-- **Process:** Defines a weighted mean absolute percentage error (WMAPE) function, sets up two search spaces (one for both Up and Ud/f, another for Ud/f only), creates objective functions for each scenario, and performs Bayesian optimization using gp_minimize.  
-- **Output:** Optimization results containing the best-found Up and Ud/f values for both scenarios.
+- **Purpose:** To determine the optimal Hubbard U parameters (U_p and U_d/f) that reduce the difference between model predictions and experimental results.  
+- **Process:** Defines a weighted mean absolute percentage error (WMAPE) function, sets up two search spaces (one for both U_p and U_d/f, another for U_d/f only), creates objective functions for each scenario, and performs Bayesian optimization using gp_minimize.  
+- **Output:** Optimization results containing the best-found U_p and U_d/f values for both scenarios.
 
 
 #### 6. Results Evaluation
@@ -161,13 +161,13 @@ def evaluate_and_print(result, case_name):
     print(f"Best loss: {result.fun:.10f}")
     print(f"Percentage differences: Band Gap: {percentage_differences[0]:.2f}%, Lattice constant a: {percentage_differences[1]:.2f}%, Lattice constant b: {percentage_differences[2]:.2f}%, Lattice constant c: {percentage_differences[3]:.2f}%")
 
-evaluate_and_print(result_both, "Original case (Both Up and Ud varying)")
-evaluate_and_print(result_ud_only, "Modified case (Up fixed to zero, Ud varying)")
+evaluate_and_print(result_both, "Original case (Both U_p and U_d/f varying)")
+evaluate_and_print(result_ud_only, "Modified case (U_p fixed to zero, U_d/f varying)")
 ```
 
 **Explanation:** This step evaluates and presents the results of the optimization of Hubbard U parameters.  
 - **Purpose:** To assess the effectiveness of the optimized Hubbard U parameters in predicting material properties.  
 - **Process:** Uses the optimized parameters to make predictions on new data, calculates percentage differences from experimental values, and provides a detailed summary including optimal parameters, predicted values, and percentage differences.  
-- **Output:** A printed summary for each optimization scenario, including the best Up and Ud/f values, predicted material properties, percentage differences from experimental values, and overall loss (WMAPE).
+- **Output:** A printed summary for each optimization scenario, including the best U_p and U_d/f values, predicted material properties, percentage differences from experimental values, and overall loss (WMAPE).
 
 This script provides a comprehensive approach to predicting material properties using Polynomial Regression and optimizing Hubbard U parameters. It can be adapted for various regressors, materials and properties by adjusting the regressor, input data, experimental values, and optimization parameters.
