@@ -1,4 +1,4 @@
-This README explains the Python script that uses Polynomial Regression to predict material properties and optimize Hubbard U parameters. The script is designed to work with material science data, specifically for predicting properties like band gap and lattice constants.
+This README explains the Notebook that uses Polynomial Regression to predict material properties and optimize Hubbard U parameters. The script is designed to work with material data, specifically for predicting properties like band gap and lattice constants.
 
 #### 1. Model Training
 
@@ -8,11 +8,10 @@ multi_target_model = MultiOutputRegressor(pr_model)
 multi_target_model.fit(X, y)
 ```
 
-This section creates and trains the Polynomial Regression model:
-
-A pipeline is created with PolynomialFeatures(2) (for quadratic terms) and LinearRegression().
-MultiOutputRegressor is used to handle multiple target variables simultaneously.
-The model is trained on the input data X and target variables y.
+**Explanation:** This step creates and trains a Polynomial Regression model to predict multiple material properties.  
+- **Purpose:** To develop a model capable of simultaneously predicting various material properties using polynomial regression.  
+- **Process:** Combines PolynomialFeatures (degree 2) with LinearRegression in a pipeline and wraps it in a MultiOutputRegressor to handle multiple target variables. Fits the model to input data (X) and target variables (y).  
+- **Output:** A trained multi-target Polynomial Regression model.
 
 #### 2. Feature Coefficient Extraction
 ```python
@@ -36,12 +35,11 @@ print(coefficients)
 print("Intercepts:")
 print(intercept)
 ```
-This section defines a function to extract feature coefficients from the trained model:
+**Explanation:** This step extracts and displays the coefficients and intercepts of the trained model for each target variable.  
+- **Purpose:** To analyze the significance of each feature in predicting target variables.  
+- **Process:** Iterates through each estimator in the multi-output model, extracts coefficients and intercepts for polynomial features, and organizes these into a DataFrame and array.  
+- **Output:** A DataFrame of coefficients for each feature and target, an array of intercepts for each target, and a printed summary of coefficients and intercepts.
 
-It iterates through each estimator in the multi-output model.
-Extracts coefficients and intercepts for each target variable.
-Returns a DataFrame of coefficients and an array of intercepts.
-The extracted coefficients and intercepts are then printed.
 
 #### 3. Visualization of Feature Coefficients
 ```python
@@ -62,36 +60,37 @@ def plot_feature_coefficients(coefficients, intercept, target_names):
 target_names = ['Calculated_Band_Gap/eV', 'Calculated_a/angstrom', 'Calculated_b/angstrom', 'Calculated_c/angstrom']
 plot_feature_coefficients(coefficients, intercept, target_names)
 ```
-This section visualizes the feature coefficients:
-
-A function is defined to create bar plots of feature coefficients for each target variable.
-The function is called with the extracted coefficients, intercepts, and target names.
-This visualization helps in understanding the importance of each feature for predicting different material properties.
+**Explanation:** This step visualizes the importance of each feature in predicting different material properties.  
+- **Purpose:** To provide a visual representation of each feature's impact on the prediction of various material properties.  
+- **Process:** Creates a bar plot for each target variable where each bar represents the magnitude of a feature's coefficient.  
+- **Output:** A series of bar plots, one for each target variable, showing the relative importance of features.
 
 #### 4. New Data Prediction
 ```python
-new_data = pd.read_excel('All System Model May 2024.xlsx', sheet_name='C-CeO2')
+new_data = pd.read_excel('<materials_data>.xlsx', sheet_name='<sheet_name>')
 X_new = new_data[features]
 ```
 
 ```python
-# Experimental values for Cubic CeO2
-exp_band_gap = 3.2
-exp_lattice_a = 5.411
-exp_lattice_b = 5.411
-exp_lattice_c = 5.411
+# Experimental values for Material
+exp_band_gap = <material_exp_band_gap>
+exp_lattice_a = <material_exp_lattice_a>
+exp_lattice_b = <material_exp_lattice_b>
+exp_lattice_c = <material_exp_lattice_c>
 
 experimental_values = np.array([exp_band_gap, exp_lattice_a, exp_lattice_b, exp_lattice_c])
 ```
 
 ```python
 weights = np.array([1, 1, 1, 1])  # Equal weights for all properties
+weights = np.array([1, 0, 0, 0])  # Emphasis on band gap
 ```
 
-This section prepares for prediction on new data:
-Loads new data from an Excel file.
-Sets experimental values for comparison (in this case, for Cubic CeO2).
-Defines weights for each property in the optimization process.
+**Explanation:** This step prepares for making predictions on new, unseen data and establishes comparison metrics.  
+- **Purpose:** To set up the prediction framework for new data and define metrics for comparing predicted and experimental values.  
+- **Process:** Loads new data from an Excel file, defines experimental values for comparison, and sets weights for different properties in the optimization process.  
+- **Output:** Prepared new data (X_new) and defined experimental values and weights for comparison.
+
 
 
 
@@ -136,15 +135,14 @@ def objective_ud_only(ud_value):
 ```
 ```python
 result_both = gp_minimize(objective_both, search_space_both, n_calls=200, random_state=100)
-result_ud_only = gp_minimize(objective_ud_only, search_space_ud_only, n_calls=50, random_state=100)
+result_ud_only = gp_minimize(objective_ud_only, search_space_ud_only, n_calls=200, random_state=100)
 ```
 
-This section performs Bayesian optimization to find optimal Hubbard U parameters:
+**Explanation:** This step optimizes the Hubbard U parameters to minimize discrepancies between predicted and experimental values.  
+- **Purpose:** To determine the optimal Hubbard U parameters (Up and Ud/f) that reduce the difference between model predictions and experimental results.  
+- **Process:** Defines a weighted mean absolute percentage error (WMAPE) function, sets up two search spaces (one for both Up and Ud/f, another for Ud/f only), creates objective functions for each scenario, and performs Bayesian optimization using gp_minimize.  
+- **Output:** Optimization results containing the best-found Up and Ud/f values for both scenarios.
 
-Defines a function to calculate Weighted Mean Absolute Percentage Error (WMAPE).
-Sets up two search spaces: one for optimizing both Up and Ud, another for optimizing only Ud.
-Defines objective functions for both cases.
-Uses gp_minimize for Bayesian optimization to find the best parameters.
 
 #### 6. Results Evaluation
 
@@ -172,10 +170,9 @@ evaluate_and_print(result_both, "Original case (Both Up and Ud varying)")
 evaluate_and_print(result_ud_only, "Modified case (Up fixed to zero, Ud varying)")
 ```
 
-This section evaluates and prints the optimization results:
+**Explanation:** This step evaluates and presents the results of the optimization of Hubbard U parameters.  
+- **Purpose:** To assess the effectiveness of the optimized Hubbard U parameters in predicting material properties.  
+- **Process:** Uses the optimized parameters to make predictions on new data, calculates percentage differences from experimental values, and provides a detailed summary including optimal parameters, predicted values, and percentage differences.  
+- **Output:** A printed summary for each optimization scenario, including the best Up and Ud/f values, predicted material properties, percentage differences from experimental values, and overall loss (WMAPE).
 
-Defines a function to evaluate the results and print detailed information.
-Calls this function for both optimization cases (varying both Up and Ud, and varying only Ud).
-Prints the best-found parameters, predicted values, and percentage differences from experimental values.
-
-This script provides a comprehensive approach to predicting material properties using Polynomial Regression and optimizing Hubbard U parameters. It can be adapted for various materials and properties by adjusting the input data, experimental values, and optimization parameters.
+This script provides a comprehensive approach to predicting material properties using Polynomial Regression and optimizing Hubbard U parameters. It can be adapted for various regressors, materials and properties by adjusting the regressor, input data, experimental values, and optimization parameters.
