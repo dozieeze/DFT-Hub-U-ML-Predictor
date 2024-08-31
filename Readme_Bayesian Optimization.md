@@ -72,12 +72,7 @@ X_new = new_data[features]
 ```
 
 ```python
-# Experimental values for Material
-exp_band_gap = <material_exp_band_gap>
-exp_lattice_a = <material_exp_lattice_a>
-exp_lattice_b = <material_exp_lattice_b>
-exp_lattice_c = <material_exp_lattice_c>
-
+#exp_band_gap, exp_lattice_a, exp_lattice_b, exp_lattice_c = <material_exp_band_gap>, <material_exp_lattice_a>, <material_exp_lattice_b>, <material_exp_lattice_c>
 experimental_values = np.array([exp_band_gap, exp_lattice_a, exp_lattice_b, exp_lattice_c])
 ```
 
