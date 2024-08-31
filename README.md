@@ -1,54 +1,92 @@
 # DFT-Hub-U-ML-Predictor
 Repository for integrating Density Functional Theory (DFT) with Hubbard U correction and Machine Learning (ML) to predict band gaps and lattice parameters of metal oxides. Includes data, scripts, and model information for reproducibility and further research.
 
-## Requirement:
+## Environment Setup and Requirements
 
-### Jupyter Notebook
-This project uses Jupyter Notebook. If you don't have Jupyter installed, you can install it using pip:
+### Anaconda Recommendation
 
-```bash
-pip install jupyter
-```
+We recommend using Anaconda for managing your Python environment and packages. Anaconda provides a user-friendly way to handle dependencies and create isolated environments for your projects.
 
+You can download Anaconda from: https://www.anaconda.com/download
 
-Or if you're using Anaconda:
+Choose the version appropriate for your operating system (Windows, macOS, or Linux) and follow the installation instructions on the Anaconda website.
+
+### Create a New Environment
+
+After installing Anaconda, follow these steps to create a new environment for this project:
+
+1. Open Anaconda Prompt (on Windows) or a terminal (on macOS or Linux)
+
+2. Create a new conda environment:
+   ```bash
+   conda create --name dft-hub-u-ml python=3.9
+   ```
+
+3. Activate the new environment:
+   ```bash
+   conda activate dft-hub-u-ml
+   ```
+
+### Requirements
+
+Once you've activated the new environment, proceed with installing the required packages.
+
+#### Jupyter Notebook
+Install Jupyter Notebook using:
 
 ```bash
 conda install -c conda-forge jupyter
 ```
 
-## Required Packages:
-scikit-optimize: 0.10.2
-
-xgboost: 2.1.6
-
-numpy: 2.0.0
-
-pandas: 2.2.2
-
-scikit-learn: 1.5.1
-
-matplotlib: 3.9.1
-
-
-## NOTEBOOKS
-
-The notebook script contains a comprehensive analysis of various regression models for predicting multiple target properties using multiple features. The models are evaluated using cross-validation techniques, and feature importance is displayed for the best-performing models.
-
-### Dependencies
-
-Ensure you have the following packages installed in your environment:
+#### Other Required Packages
+Install the following packages:
 
 ```bash
-!pip install scikit-optimize==0.10.2
-!pip install xgboost==2.1.6
-!pip install numpy==2.0.0
-!pip install pandas==2.2.2
-!pip install scikit-learn==1.5.1
-!pip install matplotlib==3.9.1
+pip install scikit-optimize==0.10.2 xgboost==2.1.6 numpy==2.0.0 pandas==2.2.2 scikit-learn==1.5.1 matplotlib==3.9.1
 ```
 
-### Usage
+### Verifying Installation
+
+After installation, verify that everything is set up correctly:
+
+1. List installed packages:
+   ```bash
+   pip list
+   ```
+
+2. Create a Jupyter kernel for this environment:
+   ```bash
+   python -m ipykernel install --user --name dft-hub-u-ml --display-name "Python (dft-hub-u-ml)"
+   ```
+
+### Launching Jupyter Notebook
+
+To start working on your project:
+
+1. Ensure you're in the dft-hub-u-ml environment:
+   ```bash
+   conda activate dft-hub-u-ml
+   ```
+
+2. Launch Jupyter Notebook:
+   ```bash
+   jupyter notebook
+   ```
+
+3. In the Jupyter interface, create a new notebook or open an existing one, and select the "Python (dft-hub-u-ml)" kernel.
+
+### Deactivating the Environment
+
+When you're done working on the project, you can deactivate the environment:
+
+```bash
+conda deactivate
+```
+
+By following these steps, you'll have a dedicated environment for your DFT-Hub-U-ML project with all the necessary dependencies installed and isolated from other projects. Using Anaconda simplifies the process of managing Python environments and packages, making it easier to maintain consistent and reproducible project setups.
+
+
+### Jupyter Notebook Usage
 
 #### 1. Import Necessary Libraries
 
