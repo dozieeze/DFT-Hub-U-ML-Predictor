@@ -2,7 +2,7 @@
 
 The computational setup for structure optimization and band structure calculations was consistent across all oxide systems. We made minor adjustments to the KPOINTS values, aligning them with similar, already converged values found in the [Materials Project repository](https://docs.materialsproject.org/methodology/materials-methodology/calculation-details/gga+u-calculations/parameters-and-convergence). The energy cutoff for the plane-wave basis set (ENCUT) was set to 520 eV for all metal oxides, approximately double the converged value obtained from the Materials Project repository. 
 
-### VASP Input Parameters
+**VASP Input Parameters**
 
 - **Precision Setting:** Normal
 - **Stress Tensor Optimization:** Fully optimized (ISIF = 3)
@@ -19,7 +19,7 @@ The computational setup for structure optimization and band structure calculatio
 - **Ud/f Values:** Integer steps from 2.00 eV to 10.00 eV
 - **Wavefunction Initialization:** From scratch (ISTART = 0, ICHARG = 2)
 
-### Band Structure and DOS Calculations
+**Band Structure and DOS Calculations**
 
 For band structure and density of states (DOS) calculations, the primary modifications included:
 
@@ -31,8 +31,8 @@ For band structure and density of states (DOS) calculations, the primary modific
 - **Wavefunction Information (LWAVE):** Disabled
 
 In both structure optimization and electronic structure calculations, the **U** values ranged from 0 eV to 10 eV, and **Ud/f** values ranged from 2 eV to 10 eV. This setup allowed for an extensive evaluation of their impact on the electronic structures (band gap) and lattice parameters (a, b, c) of the metal oxides.
-
-**Sheet Name Descriptions:**
+<br></br>
+## Sheet Name Descriptions
 
 - **Orig:** Contains material data without extrapolation data.
 - **Without 'Orig':** Includes both extrapolation data and the initial material data.
@@ -57,7 +57,7 @@ In both structure optimization and electronic structure calculations, the **U** 
 - **All_Systems (-m-ZrO2)+ Extra:** Complete dataset of metal oxides (excluding monoclinic ZrO2) with extrapolation data included.
 
 <br></br>
-**Descriptions of features used in model training across metal oxides.**
+## Descriptions of features used in model training across metal oxides.
 
 | Features                               | Description                                                           |
 |----------------------------------------|-----------------------------------------------------------------------|
